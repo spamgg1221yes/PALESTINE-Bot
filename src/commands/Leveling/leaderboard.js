@@ -2,8 +2,18 @@ import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
 import { TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
 import { getLeaderboard, getLevelingConfig, getXpForLevel } from '../../services/leveling/leveling.js';
-
 import { InteractionHelper } from '../../utils/interactionHelper.js';
+
+/**
+ * Creates a text-based progress bar
+ */
+function createProgressBar(currentXP, requiredXP, barSize = 8) {
+  const progress = Math.min(Math.max(currentXP / requiredXP, 0), 1);
+  const filledBlocks = Math.round(progress * barSize);
+  const emptyBlocks = barSize - filledBlocks;
+  return '█'.repeat(filledBlocks) + '░'.repeat(emptyBlocks);
+}
+
 export default {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
@@ -21,7 +31,7 @@ export default {
         embeds: [
           new EmbedBuilder()
             .setColor('#f1c40f')
-            .setDescription('The leveling system is currently disabled on this server.')
+            .setDescription('⚠️ The leveling system is currently disabled on this server.')
         ],
         flags: MessageFlags.Ephemeral
       });
@@ -38,36 +48,41 @@ export default {
       );
     }
 
-    const embed = new EmbedBuilder()
-      .setTitle('Level Leaderboard')
-      .setColor('#2ecc71')
-      .setDescription("Top 10 most active members in this server:")
-      .setTimestamp();
-
     const leaderboardText = await Promise.all(
       leaderboard.map(async (user, index) => {
         try {
           const member = await interaction.guild.members.fetch(user.userId).catch(() => null);
           const userMention = member?.user.toString() || `<@${user.userId}>`;
           const xpForNextLevel = getXpForLevel(user.level + 1);
+          
+          // Progress Bar Calculation
+          const progressBar = createProgressBar(user.xp, xpForNextLevel);
+          const xpFormatted = user.xp.toLocaleString();
+          const nextXpFormatted = xpForNextLevel.toLocaleString();
 
-          let rankPrefix = `${index + 1}.`;
-          if (index === 0) rankPrefix = '🥇';
-          else if (index === 1) rankPrefix = '🥈';
-          else if (index === 2) rankPrefix = '🥉';
-          else rankPrefix = `**${index + 1}.**`;
+          // Badges for Top Ranks
+          let rankBadge = `\`#${index + 1}\``;
+          if (index === 0) rankBadge = '🥇 **#1**';
+          else if (index === 1) rankBadge = '🥈 **#2**';
+          else if (index === 2) rankBadge = '🥉 **#3**';
 
-          return `${rankPrefix} ${userMention} - Level ${user.level} (${user.xp}/${xpForNextLevel} XP)`;
+          return `${rankBadge}${userMention}\n┗ 📜 **Level ${user.level}** │ \`[${progressBar}]\` \`${xpFormatted} / ${nextXpFormatted} XP\``;
         } catch {
-          return `**${index + 1}.** Error loading user ${user.userId}`;
+          return `\`#${index + 1}\` Error loading user <@${user.userId}>`;
         }
       })
     );
 
-    embed.addFields({
-      name: 'Rankings',
-      value: leaderboardText.join('\n')
-    });
+    const embed = new EmbedBuilder()
+      .setTitle(`🏆 ${interaction.guild.name} — Leaderboard`)
+      .setColor('#5865F2') // Discord Blurple color
+      .setThumbnail(interaction.guild.iconURL({ dynamic: true }) || null)
+      .setDescription(leaderboardText.join('\n\n'))
+      .setFooter({ 
+        text: `Requested by ${interaction.user.tag}`, 
+        iconURL: interaction.user.displayAvatarURL() 
+      })
+      .setTimestamp();
 
     await InteractionHelper.safeEditReply(interaction, { embeds: [embed] });
     logger.debug(`Leaderboard displayed for guild ${interaction.guildId}`);
