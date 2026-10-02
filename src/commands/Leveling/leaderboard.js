@@ -4,16 +4,6 @@ import { TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
 import { getLeaderboard, getLevelingConfig, getXpForLevel } from '../../services/leveling/leveling.js';
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 
-/**
- * Creates a text-based progress bar
- */
-function createProgressBar(currentXP, requiredXP, barSize = 8) {
-  const progress = Math.min(Math.max(currentXP / requiredXP, 0), 1);
-  const filledBlocks = Math.round(progress * barSize);
-  const emptyBlocks = barSize - filledBlocks;
-  return '█'.repeat(filledBlocks) + '░'.repeat(emptyBlocks);
-}
-
 export default {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
@@ -30,8 +20,8 @@ export default {
       await InteractionHelper.safeEditReply(interaction, {
         embeds: [
           new EmbedBuilder()
-            .setColor('#f1c40f')
-            .setDescription('⚠️ The leveling system is currently disabled on this server.')
+            .setColor('#ED4245')
+            .setDescription('🚫 **The leveling system is currently disabled on this server.**')
         ],
         flags: MessageFlags.Ephemeral
       });
@@ -48,36 +38,46 @@ export default {
       );
     }
 
-    const leaderboardText = await Promise.all(
+    const top3 = [];
+    const rest = [];
+
+    await Promise.all(
       leaderboard.map(async (user, index) => {
         try {
           const member = await interaction.guild.members.fetch(user.userId).catch(() => null);
           const userMention = member?.user.toString() || `<@${user.userId}>`;
-          const xpForNextLevel = getXpForLevel(user.level + 1);
-          
-          // Progress Bar Calculation
-          const progressBar = createProgressBar(user.xp, xpForNextLevel);
-          const xpFormatted = user.xp.toLocaleString();
-          const nextXpFormatted = xpForNextLevel.toLocaleString();
+          const xpForNext = getXpForLevel(user.level + 1);
 
-          // Badges for Top Ranks
-          let rankBadge = `\`#${index + 1}\``;
-          if (index === 0) rankBadge = '🥇 **#1**';
-          else if (index === 1) rankBadge = '🥈 **#2**';
-          else if (index === 2) rankBadge = '🥉 **#3**';
-
-          return `${rankBadge}${userMention}\n┗ 📜 **Level ${user.level}** │ \`[${progressBar}]\` \`${xpFormatted} / ${nextXpFormatted} XP\``;
+          if (index === 0) {
+            top3[0] = `👑 **#1** │ ${userMention}\n> Level \`${user.level}\` • \`${user.xp.toLocaleString()}/${xpForNext.toLocaleString()} XP\``;
+          } else if (index === 1) {
+            top3[1] = `🥈 **#2** │ ${userMention}\n> Level \`${user.level}\` • \`${user.xp.toLocaleString()}/${xpForNext.toLocaleString()} XP\``;
+          } else if (index === 2) {
+            top3[2] = `🥉 **#3** │ ${userMention}\n> Level \`${user.level}\` • \`${user.xp.toLocaleString()}/${xpForNext.toLocaleString()} XP\``;
+          } else {
+            rest[index - 3] = `\`#${(index + 1).toString().padStart(2, '0')}\` ${userMention} — **Lvl ${user.level}** (\`${user.xp.toLocaleString()} XP\`)`;
+          }
         } catch {
-          return `\`#${index + 1}\` Error loading user <@${user.userId}>`;
+          if (index < 3) top3[index] = `\`#${index + 1}\` Error loading user <@${user.userId}>`;
+          else rest[index - 3] = `\`#${index + 1}\` Error loading user <@${user.userId}>`;
         }
       })
     );
 
     const embed = new EmbedBuilder()
-      .setTitle(`🏆 ${interaction.guild.name} — Leaderboard`)
-      .setColor('#5865F2') // Discord Blurple color
-      .setThumbnail(interaction.guild.iconURL({ dynamic: true }) || null)
-      .setDescription(leaderboardText.join('\n\n'))
+      .setTitle(`✨ ${interaction.guild.name} Top Activity`)
+      .setColor('#2F3136')
+      .setThumbnail(interaction.guild.iconURL({ dynamic: true }) || null);
+
+    if (top3.length > 0) {
+      embed.addFields({ name: '🔥 Top Champions', value: top3.join('\n\n'), inline: false });
+    }
+
+    if (rest.length > 0) {
+      embed.addFields({ name: '⚡ Contenders', value: rest.join('\n'), inline: false });
+    }
+
+    embed
       .setFooter({ 
         text: `Requested by ${interaction.user.tag}`, 
         iconURL: interaction.user.displayAvatarURL() 
