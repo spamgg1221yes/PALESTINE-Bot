@@ -66,7 +66,7 @@ const appConfig = {
       }
     },
     moderatorGuidelines: {
-      title: "Moderator Rules & Guidelines",
+      title: "Staff Terms & Conditions",
       rules: [
         { id: 1, topic: "Language Policy", description: "If any member speaks a language other than English in general chat, remind them to use English and guide them to #global-discussion for other languages." },
         { id: 2, topic: "Handling Toxicity & Abuse", description: "If anyone uses offensive language, abuses, or spreads toxicity, immediately issue a timeout based on severity." },
