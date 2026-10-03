@@ -41,66 +41,39 @@ const appConfig = {
       "Adopt our server tag (GAZA) in your profile or nickname.",
       "Invite at least 5 new members to the server.",
       "Stay active and engaged in the chat.",
-      "All requirements must be verified and completed before final role assignment."
+      "All requirements must be verified before final role assignment."
     ],
     applications: {
       admin: {
         title: "Admin Application",
         questions: [
-          {
-            id: "q1",
-            label: "Experience & Motivation",
-            question: "What prior experience do you have in server administration or staff leadership, and why are you applying for Admin on PALESTINE?",
-            required: true
-          },
-          {
-            id: "q2",
-            label: "Emergency Response",
-            question: "Scenario: A serious conflict or raid occurs while senior leadership is offline. What immediate step-by-step actions will you take to protect the server and restore order?",
-            required: true
-          },
-          {
-            id: "q3",
-            label: "Availability & Staff Management",
-            question: "How many hours per week can you dedicate to the server, and how would you handle a situation where a staff member under you breaks a rule?",
-            required: true
-          }
+          { id: "q1", label: "Past Experience", question: "What is your past Admin experience?", required: true },
+          { id: "q2", label: "Motivation", question: "Why do you want Admin on PALESTINE?", required: true },
+          { id: "q3", label: "Emergency Scenario", question: "How will you handle a raid if leaders are away?", required: true },
+          { id: "q4", label: "Staff Supervision", question: "How would you deal with a breaking staff member?", required: true },
+          { id: "q5", label: "Weekly Commitment", question: "How many hours per week can you dedicate?", required: true }
+        ]
+      },
+      moderator: {
+        title: "Moderator Application",
+        questions: [
+          { id: "q1", label: "Motivation", question: "Why do you want Moderator on PALESTINE?", required: true },
+          { id: "q2", label: "Past Experience", question: "What prior moderation experience do you have?", required: true },
+          { id: "q3", label: "Moderation Handling", question: "How will you handle toxicity, spam, or abuse?", required: true },
+          { id: "q4", label: "Chat Engagement", question: "How will you keep chat active and welcoming?", required: true },
+          { id: "q5", label: "Activity & Timezone", question: "What is your weekly activity and time zone?", required: true }
         ]
       }
     },
     moderatorGuidelines: {
       title: "Moderator Rules & Guidelines",
       rules: [
-        {
-          id: 1,
-          topic: "Language Policy",
-          description: "If any member speaks a language other than English in the general chat, politely remind them to use English and guide them to use #global-discussion for other languages."
-        },
-        {
-          id: 2,
-          topic: "Handling Toxicity & Abuse",
-          description: "If anyone uses offensive language, abuses, or spreads toxicity, immediately issue a timeout based on severity."
-        },
-        {
-          id: 3,
-          topic: "Maintaining Chat Activity",
-          description: "Moderators must keep the chat lively, engage with members, and help revive dead chats by starting healthy conversations or asking questions."
-        },
-        {
-          id: 4,
-          topic: "Enforcing Server Rules",
-          description: "Ensure all members follow community guidelines. Actively monitor and take immediate action against spam, self-promotion, or unsafe links."
-        },
-        {
-          id: 5,
-          topic: "Assisting New Members",
-          description: "Welcome newcomers, answer basic questions about the server, and guide them on server mechanics to ensure a comfortable environment."
-        },
-        {
-          id: 6,
-          topic: "Professional Conduct",
-          description: "Always remain calm, fair, and professional while dealing with members. Do not misuse permissions, and set a positive example for the community."
-        }
+        { id: 1, topic: "Language Policy", description: "If any member speaks a language other than English in general chat, remind them to use English and guide them to #global-discussion for other languages." },
+        { id: 2, topic: "Handling Toxicity & Abuse", description: "If anyone uses offensive language, abuses, or spreads toxicity, immediately issue a timeout based on severity." },
+        { id: 3, topic: "Maintaining Chat Activity", description: "Keep chat lively, engage with members, and help revive dead chats by starting healthy conversations." },
+        { id: 4, topic: "Enforcing Server Rules", description: "Ensure all members follow rules. Monitor and take immediate action against spam, self-promotion, or unsafe links." },
+        { id: 5, topic: "Assisting New Members", description: "Welcome newcomers, answer basic questions, and guide them on server mechanics." },
+        { id: 6, topic: "Professional Conduct", description: "Remain calm, fair, and professional. Do not misuse permissions, and set a good example." }
       ]
     }
   },
