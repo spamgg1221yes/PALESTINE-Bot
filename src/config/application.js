@@ -32,11 +32,19 @@ const appConfig = {
   },
 
   // -------------------------------------------------------------
-  // STAFF APPLICATIONS & TERMS AND CONDITIONS
+  // STAFF APPLICATIONS, TIMERS & TERMS AND CONDITIONS
   // -------------------------------------------------------------
   staffSystem: {
     serverTag: "GAZA",
     requiredInvites: 5,
+    
+    // Application Timeouts & Cooldowns
+    settings: {
+      cooldownBetweenAppsMs: 24 * 60 * 60 * 1000, // 24 Hours cooldown before applying again
+      modalTimeoutMs: 15 * 60 * 1000,              // 15 Minutes to complete the form
+      autoCloseAfterDays: 7                        // Auto-close open applications after 7 days
+    },
+
     termsAndConditions: [
       "Adopt our server tag (GAZA) in your profile or nickname.",
       "Invite at least 5 new members to the server.",
@@ -46,6 +54,7 @@ const appConfig = {
     applications: {
       admin: {
         title: "Admin Application",
+        cooldownHours: 48, // Specific 48h cooldown for Admin
         questions: [
           { id: "q1", label: "Past Experience", question: "What is your past Admin experience?", required: true },
           { id: "q2", label: "Motivation", question: "Why do you want Admin on PALESTINE?", required: true },
@@ -56,6 +65,7 @@ const appConfig = {
       },
       moderator: {
         title: "Moderator Application",
+        cooldownHours: 24, // Specific 24h cooldown for Moderator
         questions: [
           { id: "q1", label: "Motivation", question: "Why do you want Moderator on PALESTINE?", required: true },
           { id: "q2", label: "Past Experience", question: "What prior moderation experience do you have?", required: true },
