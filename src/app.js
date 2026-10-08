@@ -52,24 +52,6 @@ startupLog('Initializing database...');
       const dbInstance = await initializeDatabase();
       this.db = dbInstance.db;
 
-      // Create AFK table on startup if it doesn't exist
-      try {
-        if (this.db && !this.db.getStatus().isDegraded) {
-          await this.db.query(`
-            CREATE TABLE IF NOT EXISTS afk_users (
-                guild_id VARCHAR(32) NOT NULL,
-                user_id VARCHAR(32) NOT NULL,
-                reason TEXT DEFAULT 'AFK',
-                timestamp BIGINT NOT NULL,
-                PRIMARY KEY (guild_id, user_id)
-            );
-          `);
-          startupLog('✅ AFK database table verified/created');
-        }
-      } catch (afkErr) {
-        logger.error('Failed to create afk_users table:', afkErr);
-      }
-
       // Check database status and report
       const dbStatus = this.db.getStatus();
 
