@@ -48,12 +48,14 @@ class TitanBot extends Client {
     this.rest = new REST({ version: '10' }).setToken(config.bot.token);
   }
 
-startupLog('Initializing database...');
+  async start() {
+    try {
+      startupLog('Starting TitanBot...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      startupLog('Initializing database...');
       const dbInstance = await initializeDatabase();
       this.db = dbInstance.db;
-
-      // Check database status and report
-      const dbStatus = this.db.getStatus();
 
       // Check database status and report
       const dbStatus = this.db.getStatus();
